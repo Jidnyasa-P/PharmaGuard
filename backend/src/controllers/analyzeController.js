@@ -42,8 +42,8 @@ const analyzeVCF = async (req, res) => {
     const genes = geneFilter(variants);
     const geneMatchFound = genes.length > 0;
 
-    // STEP 3 → Diplotype Prediction
-    const diplotypes = diplotypePredictor(genes);
+    // STEP 3 → Diplotype Prediction (pass variants for rsid → star allele lookup)
+    const diplotypes = diplotypePredictor(genes, variants);
 
     // STEP 4 → Phenotype Prediction
     const phenotypes = phenotypePredictor(diplotypes);
@@ -62,32 +62,18 @@ const analyzeVCF = async (req, res) => {
       console.error("LLM error:", llmErr.message);
     }
 
-    // ─── Map risk to judge schema labels ───────────────────────────────────────
-    const riskLabelMap = {
-      HIGH: "Toxic",
-      MODERATE: "Adjust Dosage",
-      LOW: "Safe",
-    };
-    const severityMap = {
-      HIGH: "high",
-      MODERATE: "moderate",
-      LOW: "none",
-    };
-    const confidenceMap = {
-      HIGH: 0.92,
-      MODERATE: 0.78,
-      LOW: 0.65,
-    };
+    // Risk → judge schema labels
+    const riskLabelMap = { HIGH: "Toxic", MODERATE: "Adjust Dosage", LOW: "Safe" };
+    const severityMap  = { HIGH: "high", MODERATE: "moderate", LOW: "none" };
+    const confidenceMap = { HIGH: 0.92, MODERATE: 0.78, LOW: 0.65 };
 
-    // Phenotype short code → full string for judge schema
     const phenotypeCode = (fullPheno) => {
       if (!fullPheno) return "Unknown";
-      if (fullPheno === "Poor Metabolizer") return "PM";
-      if (fullPheno === "Intermediate Metabolizer") return "IM";
-      if (fullPheno === "Normal Metabolizer") return "NM";
-      if (fullPheno === "Rapid Metabolizer") return "RM";
-      if (fullPheno === "Ultra-Rapid Metabolizer") return "URM";
-      if (fullPheno === "Sensitive") return "IM";
+      if (fullPheno === "Poor Metabolizer")         return "PM";
+      if (fullPheno === "Intermediate Metabolizer")  return "IM";
+      if (fullPheno === "Normal Metabolizer")        return "NM";
+      if (fullPheno === "Rapid Metabolizer")         return "RM";
+      if (fullPheno === "Ultra-Rapid Metabolizer")   return "URM";
       return "Unknown";
     };
 
@@ -96,7 +82,6 @@ const analyzeVCF = async (req, res) => {
     const primaryPhenotypeFull = phenotypes[primaryGene] || "Unknown";
     const primaryPhenotypeCode = phenotypeCode(primaryPhenotypeFull);
 
-    // Only include pharmacogenomically relevant variants (those with known rsids)
     const relevantVariants = variants
       .filter(v => v.rsid && v.rsid !== "." && v.rsid.startsWith("rs"))
       .slice(0, 20)
@@ -104,7 +89,6 @@ const analyzeVCF = async (req, res) => {
 
     const elapsedMs = Date.now() - startTime;
 
-    // ─── FINAL JUDGE-COMPLIANT OUTPUT ──────────────────────────────────────────
     res.json({
       patient_id: "PATIENT_001",
       drug: drug,

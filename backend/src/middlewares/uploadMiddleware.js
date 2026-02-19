@@ -4,70 +4,50 @@ const fs = require("fs");
 
 // Ensure uploads directory exists
 const uploadDir = path.join(__dirname, "../uploads/vcfFiles");
-
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Storage Config
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    const uniqueName = Date.now() + "-" + file.originalname;
-    cb(null, uniqueName);
-  },
+  destination: (req, file, cb) => cb(null, uploadDir),
+  filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
 });
 
-// File Filter (Only .vcf allowed)
 const fileFilter = (req, file, cb) => {
   const ext = path.extname(file.originalname).toLowerCase();
-
-  if (ext !== ".vcf") {
-    return cb(new Error("Only VCF files are allowed"));
+  // Accept .vcf and .txt (some VCF files are renamed .txt)
+  if (ext !== ".vcf" && ext !== ".txt") {
+    return cb(new Error("Only VCF files (.vcf or .txt) are allowed"));
   }
-
   cb(null, true);
 };
 
-// Upload Middleware
 const upload = multer({
   storage,
   fileFilter,
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
-  },
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
 });
 
-// VCF v4.2 Validator Middleware
 const validateVCF = (req, res, next) => {
   try {
     if (!req.file) {
-      return res.status(400).json({
-        error: "VCF file is required",
-      });
+      return res.status(400).json({ error: "VCF file is required" });
     }
 
     const filePath = req.file.path;
     const content = fs.readFileSync(filePath, "utf-8");
 
-    // Check for VCF v4.2 header
-    if (!content.includes("##fileformat=VCFv4.2")) {
+    // Accept VCFv4.1, v4.2, v4.3 or generic VCF headers
+    if (!content.includes("##fileformat=VCF")) {
       return res.status(400).json({
-        error: "Invalid VCF file. Must be VCF v4.2 format.",
+        error: "Invalid VCF file. File must contain ##fileformat=VCF header. Please upload a valid VCF v4.2 file.",
       });
     }
 
     next();
   } catch (err) {
-    return res.status(500).json({
-      error: "Error validating VCF file",
-    });
+    return res.status(500).json({ error: "Error validating VCF file: " + err.message });
   }
 };
 
-module.exports = {
-  upload,
-  validateVCF,
-};
+module.exports = { upload, validateVCF };
