@@ -10,6 +10,7 @@ const AnalysisPage: React.FC = () => {
   const [drugInput, setDrugInput] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -60,32 +61,56 @@ const AnalysisPage: React.FC = () => {
     }
   };
 
-  const handleAnalyze = () => {
+
+  const handleAnalyze = async () => {
     if (!file || selectedDrugs.length === 0) return;
     setIsAnalyzing(true);
-    
-    // Simulate processing
-    setTimeout(() => {
+    setError(null);
+
+    try {
+      const results = [];
+
+      for (const drug of selectedDrugs) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('drug', drug);
+
+        const response = await fetch('/api/analyze', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(errData.error || `Failed to analyze ${drug}`);
+        }
+
+        const data = await response.json();
+        results.push(data);
+      }
+
       const newId = `ANL-${Math.floor(10000 + Math.random() * 90000)}`;
-      const patientId = `PX-${Math.floor(1000 + Math.random() * 9000)}`;
-      
-      const analysisResult = {
+      const patientId = results[0]?.patient_id || `PX-${Math.floor(1000 + Math.random() * 9000)}`;
+
+      const analysisRecord = {
         id: newId,
         date: new Date().toISOString(),
         patientId: patientId,
         drugs: selectedDrugs,
-        status: 'Complete' as const
+        status: 'Complete' as const,
       };
 
-      // Save to singular result for the next page
+      localStorage.setItem('lastAnalysisResults', JSON.stringify(results));
       localStorage.setItem('lastAnalysis', JSON.stringify({ drugs: selectedDrugs }));
 
-      // Append to global history
       const existingHistory = JSON.parse(localStorage.getItem('pharmaGuardHistory') || '[]');
-      localStorage.setItem('pharmaGuardHistory', JSON.stringify([analysisResult, ...existingHistory]));
+      localStorage.setItem('pharmaGuardHistory', JSON.stringify([analysisRecord, ...existingHistory]));
 
       navigate('/results');
-    }, 2500);
+    } catch (err: any) {
+      setError(err.message || 'Analysis failed. Please try again.');
+      setIsAnalyzing(false);
+    }
   };
 
   return (
@@ -198,7 +223,12 @@ const AnalysisPage: React.FC = () => {
           </section>
 
           {/* Analyze Button */}
-          <div className="pt-6 border-t border-slate-100 flex justify-end">
+          <div className="pt-6 border-t border-slate-100 flex flex-col items-end gap-3">
+            {error && (
+              <div className="w-full p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-sm font-medium">
+                ⚠️ {error}
+              </div>
+            )}
             <button
               onClick={handleAnalyze}
               disabled={!file || selectedDrugs.length === 0 || isAnalyzing}

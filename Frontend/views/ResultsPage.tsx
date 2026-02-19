@@ -2,13 +2,45 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Icons } from '../constants';
-import { DrugAnalysis, RiskLevel, GeneProfile, SystemSettings } from '../types';
+import { DrugAnalysis, RiskLevel, SystemSettings } from '../types';
 import RiskBadge from '../components/RiskBadge';
-import { getClinicalExplanation } from '../services/geminiService';
 
 interface ResultsPageProps {
   settings: SystemSettings;
 }
+
+// Map backend response to DrugAnalysis type
+const mapBackendResult = (data: any): DrugAnalysis => {
+  const riskLabel = data.risk_assessment?.risk_label?.toLowerCase() || 'safe';
+  let risk = RiskLevel.SAFE;
+  if (riskLabel === 'toxic' || data.risk_assessment?.severity === 'high') {
+    risk = RiskLevel.TOXIC;
+  } else if (riskLabel === 'adjust_dosage' || data.risk_assessment?.severity === 'moderate') {
+    risk = RiskLevel.ADJUST_DOSAGE;
+  }
+
+  const profile = data.pharmacogenomic_profile || {};
+  const variants = (profile.detected_variants || []).map((v: any) => v.rsid || v).filter(Boolean);
+
+  const geneProfiles = profile.primary_gene && profile.primary_gene !== 'Unknown' ? [{
+    gene: profile.primary_gene,
+    diplotype: profile.diplotype || 'N/A',
+    phenotype: profile.phenotype === 'PM' ? 'Poor Metabolizer'
+      : profile.phenotype === 'IM' ? 'Intermediate Metabolizer'
+      : profile.phenotype === 'NM' ? 'Normal Metabolizer'
+      : profile.phenotype || 'Unknown',
+    variants: variants.length > 0 ? variants : ['N/A'],
+  }] : [];
+
+  return {
+    drug: data.drug || 'Unknown',
+    risk,
+    confidence: data.risk_assessment?.confidence_score || 0.75,
+    geneProfiles,
+    recommendation: data.clinical_recommendation?.guideline || 'Refer to clinical guidelines.',
+    aiExplanation: data.llm_generated_explanation?.summary || '',
+  };
+};
 
 const ResultsPage: React.FC<ResultsPageProps> = ({ settings }) => {
   const [analyses, setAnalyses] = useState<DrugAnalysis[]>([]);
@@ -16,54 +48,26 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ settings }) => {
   const [expandedDrug, setExpandedDrug] = useState<string | null>(null);
 
   useEffect(() => {
-    const generateMockResults = async () => {
-      const stored = localStorage.getItem('lastAnalysis');
-      if (!stored) return;
-      
-      const { drugs } = JSON.parse(stored);
-      
-      // Seeded mock logic for demonstration
-      const mockData: DrugAnalysis[] = drugs.map((drug: string) => {
-        let risk = RiskLevel.SAFE;
-        let genes: GeneProfile[] = [];
-        let recommendation = "Standard dosing per label guidelines.";
+    const loadResults = () => {
+      const stored = localStorage.getItem('lastAnalysisResults');
+      if (!stored) {
+        setLoading(false);
+        return;
+      }
 
-        if (drug === 'CLOPIDOGREL') {
-          risk = RiskLevel.TOXIC;
-          genes = [{ gene: 'CYP2C19', diplotype: '*2/*2', phenotype: 'Poor Metabolizer', variants: ['rs12248560'] }];
-          recommendation = "Recommend alternative antiplatelet (Prasugrel/Ticagrelor).";
-        } else if (drug === 'WARFARIN') {
-          risk = RiskLevel.ADJUST_DOSAGE;
-          genes = [{ gene: 'CYP2C9', diplotype: '*1/*3', phenotype: 'Intermediate Metabolizer', variants: ['rs1799853'] }];
-          recommendation = "Reduction in starting dose (3-5mg) is warranted.";
-        } else if (drug === 'SIMVASTATIN') {
-          risk = RiskLevel.ADJUST_DOSAGE;
-          genes = [{ gene: 'SLCO1B1', diplotype: '*5/*5', phenotype: 'Low Function', variants: ['rs4149056'] }];
-          recommendation = "Limit Simvastatin dose to 20mg or switch to Rosuvastatin.";
-        }
-
-        return {
-          drug,
-          risk,
-          confidence: 0.94 + (Math.random() * 0.05),
-          geneProfiles: genes,
-          recommendation
-        };
-      });
-
-      // Enhance with AI using the passed settings
-      const enhancedData = await Promise.all(mockData.map(async (item) => {
-        const explanation = await getClinicalExplanation(item, settings);
-        return { ...item, aiExplanation: explanation };
-      }));
-
-      setAnalyses(enhancedData);
+      try {
+        const rawResults = JSON.parse(stored);
+        const mapped = rawResults.map(mapBackendResult);
+        setAnalyses(mapped);
+        if (mapped.length > 0) setExpandedDrug(mapped[0].drug);
+      } catch (e) {
+        console.error('Failed to parse results', e);
+      }
       setLoading(false);
-      if (enhancedData.length > 0) setExpandedDrug(enhancedData[0].drug);
     };
 
-    generateMockResults();
-  }, [settings]);
+    loadResults();
+  }, []);
 
   if (loading) {
     return (
@@ -188,7 +192,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ settings }) => {
                     <div className="absolute top-0 right-0 p-4">
                       <div className="bg-sky-500/20 text-sky-400 border border-sky-500/30 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
                         <div className="w-1.5 h-1.5 bg-sky-400 rounded-full animate-pulse"></div>
-                        Gemini Clinical AI
+                        Groq Clinical AI
                       </div>
                     </div>
                     <h4 className="text-white font-bold mb-4 flex items-center gap-2 text-lg">
