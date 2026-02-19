@@ -1,0 +1,9 @@
+{
+  "name": "pharmaguard-root",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "cd Frontend && npm install && npm run build && cp -r dist ../backend/dist",
+    "start": "cd backend && node src/server.js",
+    "install-all": "cd Frontend && npm install && cd ../backend && npm install"
+  }
+}

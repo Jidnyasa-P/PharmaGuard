@@ -9,6 +9,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Health check endpoint (for Render)
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", service: "PharmaGuard", timestamp: new Date().toISOString() });
+});
+
 // MAIN API ROUTE
 app.use("/api", analyzeRoutes);
 
