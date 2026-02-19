@@ -3,7 +3,8 @@
 **Precision Medicine • Explainable AI • Clinical Decision Support**
 
 🌐 **Live Application:** [https://pharmaguard-eslt.onrender.com](https://pharmaguard-eslt.onrender.com)
-🎥 **Demo Video:** *(Add your public LinkedIn demo link here)*
+🎥 **Demo Video:** 
+https://www.linkedin.com/posts/jidnyasa-patil-02a668344_rift2026-pharmaguard-pharmacogenomics-activity-7430395221429043200-fyuV?utm_source=share&utm_medium=member_android&rcm=ACoAAFY9JCIBqa5ZPLb3UVDlQKLktl8RY_2WZus
 
 Built for the **RIFT 2026 Hackathon — Pharmacogenomics / Explainable AI Track**
 
@@ -364,8 +365,8 @@ Move healthcare from reactive treatment → predictive precision medicine.
 
 ## 👥 Team & Roles
 
-Jidnyasa Patil-AI/ML Engineer
-Asmi Tatawar-Frontend Developer
+Jidnyasa Patil-AI/ML Engineer, 
+Asmi Tatawar-Frontend Developer, 
 Swarada Deshpande-Backend Developer
 
 ---
