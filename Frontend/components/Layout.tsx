@@ -23,6 +23,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, searchTerm, s
     { label: 'Dashboard', path: '/', icon: <Icons.Dashboard className="w-5 h-5" /> },
     { label: 'Analyze Patient', path: '/analyze', icon: <Icons.Analyze className="w-5 h-5" /> },
     { label: 'Reports History', path: '/history', icon: <Icons.History className="w-5 h-5" /> },
+    { label: 'ROI Calculator', path: '/roi', icon: <Icons.ROI className="w-5 h-5" /> },
     { label: 'Settings', path: '/settings', icon: <Icons.Settings className="w-5 h-5" /> },
   ];
 
