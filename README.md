@@ -4,7 +4,7 @@
 
 🌐 **Live Application:** [https://pharmaguard-eslt.onrender.com](https://pharmaguard-eslt.onrender.com)
 🎥 **Demo Video:** 
-https://www.linkedin.com/posts/jidnyasa-patil-02a668344_rift2026-pharmaguard-pharmacogenomics-activity-7430395221429043200-fyuV?utm_source=share&utm_medium=member_android&rcm=ACoAAFY9JCIBqa5ZPLb3UVDlQKLktl8RY_2WZus
+(https://www.linkedin.com/posts/jidnyasa-patil-02a668344_rift2026-pharmaguard-pharmacogenomics-activity-7430395221429043200-fyuV?utm_source=share&utm_medium=member_android&rcm=ACoAAFY9JCIBqa5ZPLb3UVDlQKLktl8RY_2WZus) 
 
 Built for the **RIFT 2026 Hackathon — Pharmacogenomics / Explainable AI Track**
 
