@@ -1,129 +1,375 @@
-# PharmaGuard – Pharmacogenomics Clinical Decision Support
+# 🧬 PharmaGuard — AI-Powered Pharmacogenomic Risk Intelligence Platform
 
-A full-stack web app that analyzes patient VCF genomic files against prescribed drugs and generates clinical risk reports using Groq AI (llama-3.3-70b-versatile).
+**Precision Medicine • Explainable AI • Clinical Decision Support**
 
-## Project Structure
+🌐 **Live Application:** [https://pharmaguard-eslt.onrender.com](https://pharmaguard-eslt.onrender.com)
+🎥 **Demo Video:** *(Add your public LinkedIn demo link here)*
+
+Built for the **RIFT 2026 Hackathon — Pharmacogenomics / Explainable AI Track**
+
+---
+
+## 🚀 The Vision
+
+Modern medicine still prescribes drugs using population averages — while genetics determines how each individual responds to medication.
+
+**PharmaGuard** transforms raw genomic data into **clinically actionable intelligence**, enabling safer, personalized drug prescribing through pharmacogenomics and explainable artificial intelligence.
+
+Our system analyzes patient VCF genomic files and predicts drug response risks while generating understandable clinical reasoning for healthcare professionals.
+
+---
+
+## 🧠 Problem Statement
+
+Adverse Drug Reactions (ADRs) cause thousands of preventable deaths every year. Many occur because genetic differences affect drug metabolism.
+
+Healthcare professionals face three major barriers:
+
+* Complex genomic data interpretation
+* Lack of explainable AI in medical tools
+* Limited clinical workflow integration
+
+PharmaGuard solves this by delivering **real-time pharmacogenomic decision support** through an intuitive web platform.
+
+---
+
+## ✨ Platform Features (Implemented in Website)
+
+### 📂 1. Genomic VCF Upload & Validation
+
+* Upload authentic **VCF (Variant Call Format v4.2)** files
+* File validation before processing
+* Structured genomic parsing
+* Supports real pharmacogenomic annotations:
+
+  * Gene symbols
+  * Star alleles
+  * RSIDs
+
+---
+
+### 💊 2. Multi-Drug Analysis Engine
+
+Users can analyze one or multiple drugs simultaneously.
+
+Supported drugs include:
+
+* Codeine
+* Warfarin
+* Clopidogrel
+* Simvastatin
+* Azathioprine
+* Fluorouracil
+
+✔ Comma-separated or multi-input drug selection
+✔ Automatic validation
+
+---
+
+### 🧬 3. Pharmacogenomic Gene Detection
+
+The system evaluates clinically critical genes:
+
+* CYP2D6
+* CYP2C19
+* CYP2C9
+* SLCO1B1
+* TPMT
+* DPYD
+
+Outputs include:
+
+* Diplotype prediction (*X/*Y)
+* Metabolizer phenotype (PM, IM, NM, RM, URM)
+* Variant-level detection
+
+---
+
+### ⚠️ 4. AI Drug Risk Prediction
+
+Each drug receives a personalized classification:
+
+| Risk Level      | Meaning                     |
+| --------------- | --------------------------- |
+| ✅ Safe          | Standard usage recommended  |
+| ⚠ Adjust Dosage | Modified dosing required    |
+| ❌ Toxic         | High adverse reaction risk  |
+| 🚫 Ineffective  | Reduced therapeutic benefit |
+| ❓ Unknown       | Insufficient evidence       |
+
+Includes:
+
+* Confidence scoring
+* Severity grading
+* Gene-based justification
+
+---
+
+### 🧾 5. Explainable AI Clinical Reports
+
+Unlike black-box AI systems, PharmaGuard explains *why* risks occur.
+
+Powered by **Groq** LLM infrastructure:
+
+* Variant-specific explanations
+* Biological metabolism pathways
+* Clinical reasoning summaries
+* Physician-friendly language
+
+---
+
+### 📋 6. CPIC-Aligned Recommendations
+
+Clinical recommendations follow guidance inspired by the
+**Clinical Pharmacogenetics Implementation Consortium**.
+
+Outputs include:
+
+* Dose adjustments
+* Drug alternatives
+* Monitoring advice
+
+---
+
+### 📊 7. Interactive Clinical Dashboard
+
+Your deployed platform includes a complete workflow UI:
+
+✅ Dashboard overview
+✅ Risk visualization badges
+✅ Expandable clinical insights
+✅ Patient-friendly structured results
+
+Color-coded interpretation:
+
+* Green → Safe
+* Yellow → Adjust
+* Red → Toxic / Ineffective
+
+---
+
+### 📈 8. ROI Calculator (Healthcare Impact Feature)
+
+Unique innovation included in your app:
+
+* Estimates economic impact of pharmacogenomic testing
+* Demonstrates cost savings from prevented ADRs
+* Useful for hospitals and policy decision-makers
+
+---
+
+### 🕓 9. Analysis History Tracking
+
+* Stores previous analyses
+* Enables comparison of patient results
+* Improves clinical workflow continuity
+
+---
+
+### 🔐 10. Authentication & User Workspace
+
+Platform includes:
+
+* Login interface
+* User-specific workflow
+* Personalized analysis environment
+
+---
+
+### ⚙️ 11. Settings & Configuration Panel
+
+Users can manage:
+
+* Preferences
+* Analysis behavior
+* Workflow customization
+
+---
+
+### 📦 12. Hackathon-Compliant JSON Output
+
+Generates structured outputs matching required schema:
+
+```json
+{
+  "patient_id": "PATIENT_XXX",
+  "drug": "DRUG_NAME",
+  "timestamp": "ISO8601",
+  "risk_assessment": {
+    "risk_label": "Safe | Adjust Dosage | Toxic",
+    "confidence_score": 0.0,
+    "severity": "low | moderate | high | critical"
+  },
+  "pharmacogenomic_profile": {
+    "primary_gene": "GENE",
+    "diplotype": "*X/*Y",
+    "phenotype": "PM|IM|NM|RM|URM"
+  }
+}
+```
+
+✔ Downloadable
+✔ Copy-to-clipboard
+✔ Evaluation-ready
+
+---
+
+## 🏗️ System Architecture
 
 ```
-pharmaguard-complete/
-├── backend/          ← Node.js/Express API (deploy this on Render)
-│   ├── src/          ← Server source code
-│   ├── dist/         ← Pre-built React frontend (served by backend)
-│   ├── package.json
-│   ├── render.yaml
-│   └── .env.example
-└── frontend/         ← React/TypeScript source (for local dev only)
-    ├── views/
-    ├── components/
-    ├── services/
-    └── package.json
+User Interface (React Dashboard)
+          ↓
+VCF Upload & Validation Layer
+          ↓
+Gene Filtering Engine
+          ↓
+Diplotype & Phenotype Prediction
+          ↓
+Drug Risk Classification
+          ↓
+CPIC Recommendation Engine
+          ↓
+LLM Explainability Generator
+          ↓
+Results Dashboard + JSON Export
 ```
 
 ---
 
-## 🚀 Deploy on Render (Production)
+## ⚙️ Tech Stack
 
-The backend serves the pre-built frontend from its `dist/` folder. You only deploy the **backend** folder on Render.
+### Frontend
 
-### Step 1 – Push backend to GitHub
-1. Create a new GitHub repository
-2. Copy the `backend/` folder contents into it (or the whole repo)
-3. Push to GitHub
+* React + TypeScript
+* Vite
+* Modular clinical UI components
 
-### Step 2 – Create a Web Service on Render
-1. Go to [render.com](https://render.com) → **New → Web Service**
-2. Connect your GitHub repository
-3. Configure the service:
-   - **Name:** `pharmaguard` (or any name)
-   - **Root Directory:** leave blank (or set to `backend` if you pushed the full repo)
-   - **Runtime:** `Node`
-   - **Build Command:** `npm install`
-   - **Start Command:** `npm start`
+### Backend
 
-### Step 3 – Add Environment Variables
-In Render dashboard → **Environment** tab, add:
+* Node.js + Express
+* REST API architecture
+* File upload middleware
 
-| Key | Value |
-|-----|-------|
-| `GROQ_API_KEY` | Your Groq API key from [console.groq.com](https://console.groq.com) |
+### AI Layer
 
-> **PORT** is set automatically by Render — do NOT set it manually.
+* LLM explanation service
+* Explainable reasoning pipeline
 
-### Step 4 – Deploy
-Click **Deploy** and wait ~2 minutes. Your app will be live at:
-`https://pharmaguard.onrender.com` (or whatever name you chose)
+### Deployment
+
+Hosted publicly using **Render**
 
 ---
 
-## 💻 Run Locally on Windows (VS Code)
+## 🔄 Application Workflow
 
-You need **two terminals** open simultaneously — one for backend, one for frontend.
+1. User logs into platform
+2. Uploads genomic VCF file
+3. Selects drug(s)
+4. System parses genetic variants
+5. Risk predictions generated
+6. AI explanation produced
+7. Results displayed and saved to history
+8. JSON report available for download
 
-### Prerequisites
-- [Node.js 18+](https://nodejs.org) installed on Windows
-- VS Code with the project open
+---
 
-### Terminal 1 – Start the Backend
+## 📡 API Endpoint
+
+### `POST /api/analyze`
+
+**Input**
+
+* Multipart VCF file
+* Drug names
+
+**Output**
+
+* Risk assessment
+* Pharmacogenomic profile
+* Clinical recommendations
+* AI explanation
+
+---
+
+## 🧪 Quality & Evaluation Alignment
+
+✔ VCF parsing validation
+✔ Required JSON schema compliance
+✔ Explainable reasoning
+✔ Clinical recommendation alignment
+✔ Live deployed application
+
+---
+
+## 🛠️ Local Setup
+
+### Backend
 
 ```bash
-# Navigate to backend folder
 cd backend
-
-# Create your .env file
-copy .env.example .env
-# Then open .env in VS Code and add your GROQ_API_KEY
-
-# Install dependencies
 npm install
-
-# Start the backend server
 npm run dev
 ```
-Backend runs at → **http://localhost:5000**
 
-### Terminal 2 – Start the Frontend
+### Frontend
 
 ```bash
-# Navigate to frontend folder
 cd frontend
-
-# Install dependencies
 npm install
-
-# Start the Vite dev server
 npm run dev
 ```
-Frontend runs at → **http://localhost:3000**
 
-> The frontend is configured to proxy `/api` calls to `localhost:5000` automatically via `vite.config.ts`.
+Open:
 
-### Open the App
-Visit **http://localhost:3000** in your browser.
-
----
-
-## 🔑 Getting a Groq API Key
-
-1. Go to [console.groq.com](https://console.groq.com)
-2. Sign up / Log in
-3. Go to **API Keys** → **Create API Key**
-4. Copy the key and paste it in your `.env` file as `GROQ_API_KEY=your_key_here`
+```
+http://localhost:3000
+```
 
 ---
 
-## 📋 How It Works
+## 📁 Repository Structure
 
-1. **Upload** a `.vcf` genomic file and **select drugs** on the Analysis page
-2. Frontend sends `POST /api/analyze` with the file + drug name for each drug
-3. Backend parses the VCF → filters genes → predicts diplotype/phenotype → assesses drug risk → gets CPIC recommendation → generates AI explanation via Groq
-4. Results are displayed on the Results page with risk levels, gene profiles, and clinical recommendations
+```
+frontend/
+  views/
+  components/
+  services/
+
+backend/
+  src/
+    controllers/
+    services/
+    routes/
+  sample-data/
+.env.example
+README.md
+```
 
 ---
 
-## ⚙️ Environment Variables
+## 🌍 Real-World Impact
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `GROQ_API_KEY` | ✅ Yes | Groq API key for LLM explanations |
-| `PORT` | ❌ Auto | Set automatically by Render; defaults to 5000 locally |
+PharmaGuard enables:
 
+* Safer prescriptions
+* Reduced adverse drug reactions
+* Faster genomic interpretation
+* Personalized healthcare decisions
+
+**Our mission:**
+Move healthcare from reactive treatment → predictive precision medicine.
+
+---
+
+## 👥 Team & Roles
+
+Jidnyasa Patil-AI/ML Engineer
+Asmi Tatawar-Frontend Developer
+Swarada Deshpande-Backend Developer
+
+---
+
+## 📜 License
+
+MIT License — open for research and educational innovation.
