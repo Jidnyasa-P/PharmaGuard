@@ -11,13 +11,14 @@ const AnalysisPage: React.FC = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [progress, setProgress] = useState<{ current: number; total: number; drug: string } | null>(null);
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
+    if (e.type === 'dragenter' || e.type === 'dragover') {
       setDragActive(true);
-    } else if (e.type === "dragleave") {
+    } else if (e.type === 'dragleave') {
       setDragActive(false);
     }
   };
@@ -32,7 +33,7 @@ const AnalysisPage: React.FC = () => {
   };
 
   const toggleDrug = (drug: string) => {
-    setSelectedDrugs(prev => 
+    setSelectedDrugs(prev =>
       prev.includes(drug) ? prev.filter(d => d !== drug) : [...prev, drug]
     );
   };
@@ -61,16 +62,19 @@ const AnalysisPage: React.FC = () => {
     }
   };
 
-
   const handleAnalyze = async () => {
     if (!file || selectedDrugs.length === 0) return;
     setIsAnalyzing(true);
     setError(null);
+    setProgress(null);
 
     try {
       const results = [];
 
-      for (const drug of selectedDrugs) {
+      for (let i = 0; i < selectedDrugs.length; i++) {
+        const drug = selectedDrugs[i];
+        setProgress({ current: i + 1, total: selectedDrugs.length, drug });
+
         const formData = new FormData();
         formData.append('file', file);
         formData.append('drug', drug);
@@ -89,13 +93,13 @@ const AnalysisPage: React.FC = () => {
         results.push(data);
       }
 
-      const newId = `ANL-${Math.floor(10000 + Math.random() * 90000)}`;
       const patientId = results[0]?.patient_id || `PX-${Math.floor(1000 + Math.random() * 9000)}`;
+      const newId = `ANL-${Math.floor(10000 + Math.random() * 90000)}`;
 
       const analysisRecord = {
         id: newId,
         date: new Date().toISOString(),
-        patientId: patientId,
+        patientId,
         drugs: selectedDrugs,
         status: 'Complete' as const,
       };
@@ -110,6 +114,7 @@ const AnalysisPage: React.FC = () => {
     } catch (err: any) {
       setError(err.message || 'Analysis failed. Please try again.');
       setIsAnalyzing(false);
+      setProgress(null);
     }
   };
 
@@ -122,14 +127,16 @@ const AnalysisPage: React.FC = () => {
 
       <div className="grid grid-cols-1 gap-8">
         <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm space-y-8">
+
           {/* Step 1: Upload */}
           <section>
             <div className="flex items-center gap-3 mb-4">
               <span className="w-8 h-8 rounded-full bg-sky-500 text-white flex items-center justify-center font-bold text-sm">1</span>
               <h2 className="text-lg font-bold text-slate-800">Genomic Data Source</h2>
+              <span className="ml-auto text-xs text-slate-400">Max 5 MB · .vcf format</span>
             </div>
-            
-            <div 
+
+            <div
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
               onDragOver={handleDrag}
@@ -138,9 +145,9 @@ const AnalysisPage: React.FC = () => {
                 dragActive ? 'border-sky-500 bg-sky-50' : 'border-slate-200 hover:border-slate-300 bg-slate-50'
               } ${file ? 'border-emerald-500 bg-emerald-50' : ''}`}
             >
-              <input 
-                type="file" 
-                className="absolute inset-0 opacity-0 cursor-pointer" 
+              <input
+                type="file"
+                className="absolute inset-0 opacity-0 cursor-pointer"
                 onChange={(e) => e.target.files?.[0] && setFile(e.target.files[0])}
                 accept=".vcf,.txt"
               />
@@ -149,35 +156,35 @@ const AnalysisPage: React.FC = () => {
                   <>
                     <Icons.Check className="w-12 h-12 text-emerald-500 mb-4" />
                     <p className="text-emerald-800 font-bold">{file.name}</p>
-                    <p className="text-emerald-600 text-xs mt-1">Ready for sequencing</p>
+                    <p className="text-emerald-600 text-xs mt-1">{(file.size / 1024).toFixed(1)} KB · Ready for analysis</p>
                   </>
                 ) : (
                   <>
                     <Icons.Upload className="w-12 h-12 text-slate-400 mb-4" />
                     <p className="text-slate-600 font-medium">Drag & drop .VCF file or click to browse</p>
-                    <p className="text-slate-400 text-sm mt-1">Supported formats: VCF, txt, genome-zip</p>
+                    <p className="text-slate-400 text-sm mt-1">VCF v4.2 format · Up to 5 MB</p>
                   </>
                 )}
               </div>
             </div>
           </section>
 
-          {/* Step 2: Medication Search & Select */}
+          {/* Step 2: Drugs */}
           <section>
             <div className="flex items-center gap-3 mb-4">
               <span className="w-8 h-8 rounded-full bg-sky-500 text-white flex items-center justify-center font-bold text-sm">2</span>
               <h2 className="text-lg font-bold text-slate-800">Target Medications</h2>
             </div>
-            
+
             <div className="mb-6">
-              <p className="text-sm text-slate-500 mb-2 font-medium">Type drugs (separated by commas) or select from clinical list:</p>
+              <p className="text-sm text-slate-500 mb-2 font-medium">Type drugs (press Enter or comma to add) or select from clinical list:</p>
               <div className="relative group">
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={drugInput}
                   onChange={handleInputChange}
                   onKeyDown={handleInputKeyDown}
-                  placeholder="e.g. Warfarin, Clopidogrel, Statins..."
+                  placeholder="e.g. Warfarin, Clopidogrel..."
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl py-4 px-5 pr-12 text-sm focus:ring-2 focus:ring-sky-500 transition-all outline-none font-medium"
                 />
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300">
@@ -201,9 +208,9 @@ const AnalysisPage: React.FC = () => {
                 </div>
               </div>
             )}
-            
+
             <div className="space-y-3">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Common High-Impact Drugs</p>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Supported CPIC Drugs</p>
               <div className="flex flex-wrap gap-2">
                 {AVAILABLE_DRUGS.slice(0, 10).map((drug) => (
                   <button
@@ -222,13 +229,29 @@ const AnalysisPage: React.FC = () => {
             </div>
           </section>
 
-          {/* Analyze Button */}
+          {/* Progress + Analyze Button */}
           <div className="pt-6 border-t border-slate-100 flex flex-col items-end gap-3">
             {error && (
               <div className="w-full p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-sm font-medium">
                 ⚠️ {error}
               </div>
             )}
+
+            {isAnalyzing && progress && (
+              <div className="w-full">
+                <div className="flex justify-between text-xs font-medium text-slate-500 mb-1">
+                  <span>Analyzing {progress.drug}...</span>
+                  <span>{progress.current}/{progress.total}</span>
+                </div>
+                <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-sky-500 rounded-full transition-all duration-500"
+                    style={{ width: `${(progress.current / progress.total) * 100}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
             <button
               onClick={handleAnalyze}
               disabled={!file || selectedDrugs.length === 0 || isAnalyzing}
