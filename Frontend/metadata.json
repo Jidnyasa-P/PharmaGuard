@@ -1,0 +1,7 @@
+{
+  "name": "PharmaGuard",
+  "description": "A precision medicine clinical decision support platform for pharmacogenomic risk prediction and personalized drug dosing.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

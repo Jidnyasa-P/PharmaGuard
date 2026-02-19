@@ -1,0 +1,8 @@
+##fileformat=VCFv4.2
+##source=PGxTestData
+#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  SAMPLE
+10      96521616        rs4244285      G       A       .       PASS    .       GT      1/1
+10      96540410        rs4986893      G       A       .       PASS    .       GT      0/1
+22      42128945        rs9923231      C       T       .       PASS    .       GT      1/1
+7       87160618        rs1799853      C       T       .       PASS    .       GT      0/1
+7       87138645        rs1057910      A       C       .       PASS    .       GT      1/1
