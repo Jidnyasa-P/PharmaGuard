@@ -367,7 +367,9 @@ Move healthcare from reactive treatment → predictive precision medicine.
 ## 👥 Team & Roles
 
 Jidnyasa Patil-AI/ML Engineer, 
+
 Asmi Tatawar-Frontend Developer, 
+
 Swarada Deshpande-Backend Developer
 
 ---
