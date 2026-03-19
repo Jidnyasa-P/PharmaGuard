@@ -5,9 +5,8 @@
 🌐 **Live Application:** [https://pharmaguard-eslt.onrender.com](https://pharmaguard-eslt.onrender.com)
 
 🎥 **Demo Video:** 
-[Click to Watch](https://drive.google.com/file/d/1NAB_OSuL_1cgS4Zwk2kczQjk_WV1f1tK/view?usp=drivesdk) 
+[Click to Watch](https://drive.google.com/file/d/1yd68zQ9uq_ff5MN0Ms0NY_7-TOGm6Okj/view?usp=drivesdk) 
 
-Built for the **RIFT 2026 Hackathon — Pharmacogenomics / Explainable AI Track**
 
 ---
 
